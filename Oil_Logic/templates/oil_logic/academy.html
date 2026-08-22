@@ -1,0 +1,869 @@
+{% extends 'oil_logic/base.html' %}
+
+{% block content %}
+<div class="relative w-full h-[80vh] overflow-hidden bg-[#050505]">
+    <!-- Three.js Canvas Container -->
+    <div id="molecular-canvas-container" class="absolute inset-0 z-0"></div>
+
+    <!-- UI Overlay for Molecular Info -->
+    <div class="relative z-10 w-full h-full flex flex-col pointer-events-none">
+        <!-- Top Info -->
+        <div class="p-10 flex justify-between items-start animate-in fade-in slide-in-from-top-10 duration-1000">
+            <div class="space-y-2 pointer-events-auto">
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-red-500">Molecular Engineering</p>
+                <h1 class="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-none">
+                    OIL <span class="text-transparent"
+                        style="-webkit-text-stroke: 1px rgba(255,255,255,0.3)">ACADEMY</span>
+                </h1>
+                <p class="text-gray-500 text-sm max-w-sm font-light">The chemical science of high-performance
+                    lubrication. Master the heart of engine preservation.</p>
+            </div>
+
+            <div
+                class="hidden md:block glass px-6 py-4 rounded-3xl border-white/5 pointer-events-auto text-right space-y-1">
+                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Active Particles</p>
+                <p id="particle-count" class="text-2xl font-black text-white tracking-tighter">1,250</p>
+            </div>
+        </div>
+
+        <div class="flex-grow"></div>
+
+        <!-- Bottom Controls -->
+        <div
+            class="p-10 flex flex-col md:flex-row justify-between items-end gap-10 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            <div class="flex flex-col gap-4 pointer-events-auto">
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500 ml-4">Select Molecular Grade
+                </p>
+                <div class="flex bg-black/40 p-2 rounded-[2rem] border border-white/5 glass shadow-2xl">
+                    <button onclick="switchOilType('mineral')" id="btn-mineral"
+                        class="oil-toggle-btn px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all bg-amber-500/10 text-amber-500 border border-amber-500/20">Mineral</button>
+                    <button onclick="switchOilType('semi')" id="btn-semi"
+                        class="oil-toggle-btn px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all text-gray-500 hover:text-white">Semi-Synth</button>
+                    <button onclick="switchOilType('synthetic')" id="btn-synthetic"
+                        class="oil-toggle-btn px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all text-gray-500 hover:text-white">Full-Synth</button>
+                </div>
+            </div>
+
+            <div id="info-card"
+                class="glass-premium p-6 rounded-[2rem] border-white/10 w-full md:w-80 pointer-events-auto transform transition-all duration-500">
+                <div class="flex items-center gap-4 mb-3">
+                    <div id="card-icon"
+                        class="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-500/20 text-amber-500">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div>
+                        <h4 id="card-title" class="text-lg font-black uppercase tracking-tighter text-white">Mineral Oil
+                        </h4>
+                        <p id="card-subtitle" class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">
+                            Natural Grade</p>
+                    </div>
+                </div>
+                <p id="card-desc" class="text-gray-400 text-xs leading-relaxed">Traditional refined petroleum. Features
+                    inconsistent molecular chains effective for older engine component sealing.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="max-w-6xl mx-auto px-6 py-24">
+    <!-- Articles Section -->
+    <div class="grid grid-cols-1 gap-20">
+        <!-- Understanding Viscosity -->
+        <article
+            class="glass-premium p-16 rounded-[4rem] relative overflow-hidden group hover:border-red-500/30 transition-all duration-700">
+            <div
+                class="absolute -top-20 -right-20 w-80 h-80 bg-red-500/5 blur-[120px] rounded-full group-hover:bg-red-500/10 transition-all duration-1000">
+            </div>
+
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-12 space-y-6">
+                    <div class="flex items-center gap-6 mb-4">
+                        <div
+                            class="w-20 h-20 bg-gradient-to-br from-red-500 to-red-900 rounded-[2rem] flex items-center justify-center text-white text-3xl shadow-2xl shadow-red-500/20">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-4xl font-black uppercase tracking-tighter text-white">Decoding Viscosity
+                            </h2>
+                            <p class="text-red-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">SAE Standards
+                                (e.g. 5W-30)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 space-y-6">
+                    <p class="text-white/60 leading-relaxed text-lg font-medium">
+                        Viscosity is the measure of an oil's <span class="text-white">resistance to flow</span>. It's
+                        the most critical factor in ensuring your engine stays protected during cold starts and
+                        high-heat racing.
+                    </p>
+                </div>
+
+                <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="bg-black/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 space-y-4 hover:border-red-500/20 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-3xl font-black text-red-500 uppercase">5W</span>
+                            <span
+                                class="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black uppercase tracking-widest text-white/40">Winter</span>
+                        </div>
+                        <p class="text-sm text-white/50 leading-relaxed">Lower numbers mean <span
+                                class="text-white/80 font-bold">faster flow</span> during freezing cold starts,
+                            preventing early wear.</p>
+                    </div>
+                    <div
+                        class="bg-black/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 space-y-4 hover:border-red-500/20 transition-all">
+                        <div class="flex items-center justify-between">
+                            <span class="text-3xl font-black text-red-500 uppercase">30</span>
+                            <span
+                                class="px-3 py-1 bg-white/5 rounded-full text-[9px] font-black uppercase tracking-widest text-white/40">100°C</span>
+                        </div>
+                        <p class="text-sm text-white/50 leading-relaxed">Thickness at high temperatures. Must balance
+                            <span class="text-white/80 font-bold">film strength</span> with efficiency.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- Oil Types -->
+        <article
+            class="glass-premium p-16 rounded-[4rem] group border-white/5 hover:border-white/10 transition-all duration-700">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <div
+                            class="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center text-white text-2xl group-hover:bg-red-500/10 group-hover:text-red-500 transition-all duration-500">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h2 class="text-4xl font-black uppercase tracking-tighter text-white">Mineral vs. <span
+                                class="text-red-500">Synthetic</span></h2>
+                    </div>
+                    <p class="text-white/50 leading-relaxed max-w-md">
+                        The molecular difference between crude-refined mineral oil and lab-engineered synthetic oil is
+                        what determines engine life in the long run.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-white/5 px-6 py-4 rounded-3xl border border-white/5">
+                            <p class="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Protection</p>
+                            <p class="text-lg font-black text-white">3x Superior</p>
+                        </div>
+                        <div class="bg-white/5 px-6 py-4 rounded-3xl border border-white/5">
+                            <p class="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Durability</p>
+                            <p class="text-lg font-black text-white">Extended</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div
+                        class="bg-white/2 p-8 rounded-[2.5rem] border-l-4 border-yellow-500/20 hover:bg-white/5 transition-all">
+                        <h4 class="text-lg font-black text-white/80 uppercase mb-2">Mineral Base</h4>
+                        <p class="text-sm text-white/40 leading-relaxed">Irregular molecules that break down quickly
+                            under heat. Best for older flat-tappet engines or initial break-in periods.</p>
+                    </div>
+                    <div
+                        class="bg-white/2 p-8 rounded-[2.5rem] border-l-4 border-red-500/50 hover:bg-white/5 transition-all">
+                        <h4 class="text-lg font-black text-white uppercase mb-2">Full Synthetic</h4>
+                        <p class="text-sm text-white/40 leading-relaxed">Uniformed molecules for 100% stable
+                            performance. Virtually eliminates sludge and provides extreme thermal stability.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- Industrial Ratings -->
+        <article class="glass-premium p-16 rounded-[4rem] relative overflow-hidden animate-in fade-in">
+            <div class="absolute inset-0 bg-gradient-to-tr from-red-500/5 to-transparent opacity-50"></div>
+
+            <div class="relative z-10 text-center mb-16 space-y-4">
+                <i class="fas fa-certificate text-red-500 text-5xl mb-4"></i>
+                <h2 class="text-4xl font-black uppercase tracking-tighter text-white">Industrial Ratings</h2>
+                <p class="text-white/40 text-[10px] font-black uppercase tracking-[0.4em]">Global Performance Standards
+                </p>
+            </div>
+
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div
+                    class="bg-black/40 p-8 rounded-[2.5rem] border border-white/5 hover:-translate-y-2 transition-all duration-500">
+                    <div class="h-12 flex items-center mb-6">
+                        <span class="text-2xl font-black text-red-500">API</span>
+                        <span
+                            class="ml-auto px-3 py-1 bg-white/5 rounded-full text-[8px] font-black text-white/30 uppercase tracking-widest">American</span>
+                    </div>
+                    <p class="text-xs text-white/40 uppercase font-black tracking-widest leading-loose">
+                        Current standard: <span class="text-white">SP</span><br>
+                        Focuses on engine cleanliness and LSPI prevention.
+                    </p>
+                </div>
+                <div
+                    class="bg-black/40 p-8 rounded-[2.5rem] border border-white/5 hover:-translate-y-2 transition-all duration-500">
+                    <div class="h-12 flex items-center mb-6">
+                        <span class="text-2xl font-black text-red-500">ACEA</span>
+                        <span
+                            class="ml-auto px-3 py-1 bg-white/5 rounded-full text-[8px] font-black text-white/30 uppercase tracking-widest">European</span>
+                    </div>
+                    <p class="text-xs text-white/40 uppercase font-black tracking-widest leading-loose">
+                        Common: <span class="text-white">A3/B4</span><br>
+                        High-tier performance for premium Euro Turbo engines.
+                    </p>
+                </div>
+                <div
+                    class="bg-black/40 p-8 rounded-[2.5rem] border border-white/5 hover:-translate-y-2 transition-all duration-500">
+                    <div class="h-12 flex items-center mb-6">
+                        <span class="text-2xl font-black text-red-500">ILSAC</span>
+                        <span
+                            class="ml-auto px-3 py-1 bg-white/5 rounded-full text-[8px] font-black text-white/30 uppercase tracking-widest">Economy</span>
+                    </div>
+                    <p class="text-xs text-white/40 uppercase font-black tracking-widest leading-loose">
+                        Latest: <span class="text-white">GF-6A</span><br>
+                        Maximizes fuel efficiency and emission protection.
+                    </p>
+                </div>
+            </div>
+        </article>
+
+        <!-- The Additive Package (Grid Version) -->
+        <article class="space-y-12">
+            <div class="text-left">
+                <h2 class="text-4xl font-black uppercase tracking-tighter text-white mb-2">The Additive Package</h2>
+                <div class="h-1 w-20 bg-red-500"></div>
+                <p class="mt-6 text-white/40 text-sm max-w-xl leading-relaxed">
+                    While the base oil provides lubrication, the "Additive Package" represents the chemical intelligence
+                    that cleans, seals, and prevents wear.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div
+                    class="glass-premium p-8 rounded-[2rem] text-center space-y-4 hover:border-red-500/50 transition-all">
+                    <span class="text-xs font-black text-red-500 uppercase tracking-widest">Detergents</span>
+                    <p class="text-[10px] text-white/30 uppercase font-bold tracking-wider">Keeps internals<br>pure &
+                        clean</p>
+                </div>
+                <div
+                    class="glass-premium p-8 rounded-[2rem] text-center space-y-4 hover:border-red-500/50 transition-all">
+                    <span class="text-xs font-black text-red-500 uppercase tracking-widest">Dispersants</span>
+                    <p class="text-[10px] text-white/30 uppercase font-bold tracking-wider">Captures dirt
+                        until<br>filter catches it</p>
+                </div>
+                <div
+                    class="glass-premium p-8 rounded-[2rem] text-center space-y-4 hover:border-red-500/50 transition-all">
+                    <span class="text-xs font-black text-red-500 uppercase tracking-widest">Anti-Wear</span>
+                    <p class="text-[10px] text-white/30 uppercase font-bold tracking-wider">Forms a molecular<br>armour
+                        (ZDDP)</p>
+                </div>
+                <div
+                    class="glass-premium p-8 rounded-[2rem] text-center space-y-4 hover:border-red-500/50 transition-all">
+                    <span class="text-xs font-black text-red-500 uppercase tracking-widest">Defoamers</span>
+                    <p class="text-[10px] text-white/30 uppercase font-bold tracking-wider">Ensures the oil<br>remains
+                        solid liquid</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- DIY Oil Change simulator Section -->
+        <section id="diy-simulator" class="py-24 space-y-12">
+            <div class="text-center space-y-4">
+                <p class="text-[10px] font-black uppercase tracking-[0.4em] text-red-500">Workshop Beta</p>
+                <h2 class="text-5xl font-black uppercase tracking-tighter">DIY Oil <span
+                        class="text-red-500">Change</span> Simulator</h2>
+                <p class="text-gray-500 max-w-2xl mx-auto">Master the rhythm of maintenance. Use our interactive 3D
+                    laboratory to understand the flow, the timing, and the precision required for a perfect oil change.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[600px]">
+                <!-- Left: 3D Scene -->
+                <div
+                    class="lg:col-span-8 relative rounded-[3rem] overflow-hidden glass-premium border border-white/5 group">
+                    <div id="simulator-canvas-container" class="absolute inset-0 cursor-move"></div>
+
+                    <!-- Progress Overlay -->
+                    <div class="absolute top-8 left-8 right-8 flex gap-2 pointer-events-none">
+                        <div class="sim-step-bar flex-grow h-1.5 rounded-full bg-white/10 overflow-hidden relative">
+                            <div id="progress-indicator"
+                                class="absolute inset-y-0 left-0 bg-red-600 transition-all duration-500"
+                                style="width: 20%"></div>
+                        </div>
+                    </div>
+
+                    <!-- HUD -->
+                    <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end pointer-events-none">
+                        <div class="glass p-4 rounded-2xl border-white/5 space-y-1">
+                            <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Engine Status</p>
+                            <p id="engine-status-text" class="text-xs font-black text-red-500 uppercase">Change Required
+                            </p>
+                        </div>
+                        <div class="glass p-4 rounded-2xl border-white/5 space-y-1 text-right">
+                            <p class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Oil Purity</p>
+                            <p id="purity-text" class="text-xs font-black text-white uppercase">12%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Controls & Info -->
+                <div class="lg:col-span-4 space-y-6 flex flex-col">
+                    <div class="glass-premium p-10 rounded-[2.5rem] border-white/10 flex-grow space-y-8">
+                        <div id="step-info" class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <div id="step-number"
+                                    class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center font-black text-white">
+                                    1</div>
+                                <h3 id="step-title" class="text-xl font-bold uppercase tracking-tight">Initial Check
+                                </h3>
+                            </div>
+                            <p id="step-description" class="text-gray-500 text-sm leading-relaxed">Ensure the vehicle is
+                                securely lifted. Your oil level is low and dark, indicating oxidation and contaminant
+                                buildup.</p>
+                        </div>
+
+                        <!-- Main Controls -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="prevStep()"
+                                class="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition group">
+                                <i class="fas fa-chevron-left text-gray-400 group-hover:text-white"></i>
+                            </button>
+                            <button onclick="nextStep()"
+                                class="p-4 rounded-2xl bg-red-600/20 border border-red-600/30 hover:bg-red-600 transition group">
+                                <i class="fas fa-chevron-right text-red-500 group-hover:text-white"></i>
+                            </button>
+                        </div>
+
+                        <button id="reset-btn" onclick="resetSimulator()"
+                            class="w-full p-4 rounded-2xl bg-white/5 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition">
+                            Reset Workshop
+                        </button>
+                    </div>
+
+                    <!-- Pro Tip -->
+                    <div class="glass p-6 rounded-3xl border-red-500/10 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-red-500">Pro Tip</p>
+                            <p id="pro-tip-text" class="text-[10px] text-gray-400 leading-relaxed font-medium italic">
+                                "Always run the engine for 5 minutes before draining to ensure contaminants are
+                                suspended in the fluid."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Maintenance Tips -->
+        <article
+            class="glass-premium p-16 rounded-[4rem] bg-gradient-to-br from-black/60 to-red-500/10 border-red-500/30">
+            <h2 class="text-4xl font-black uppercase tracking-tighter text-white mb-12">Expert <span
+                    class="text-red-500">Maintenance</span></h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="flex flex-col gap-4">
+                    <div class="text-red-500 text-3xl font-black opacity-20">01</div>
+                    <p class="text-sm text-white/70 italic font-medium leading-relaxed">"Always check your oil level on
+                        a level surface. A slight overfill is often safer than a low level in high-performance turbo
+                        engines."</p>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div class="text-red-500 text-3xl font-black opacity-20">02</div>
+                    <p class="text-sm text-white/70 italic font-medium leading-relaxed">"Short trips are severe service.
+                        The oil never reaches peak temperature to evaporate moisture. Change it more frequently if city
+                        driving."</p>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div class="text-red-500 text-3xl font-black opacity-20">03</div>
+                    <p class="text-sm text-white/70 italic font-medium leading-relaxed">"Never compromise on the filter.
+                        A premium synthetic oil is only as good as the filter's ability to keep the flow clean."</p>
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+
+<style>
+    .oil-toggle-btn {
+        min-width: 120px;
+    }
+
+    .glass-premium {
+        background: rgba(15, 15, 15, 0.7);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // --- Molecular Simulation Logic ---
+    let scene, camera, renderer, controls;
+    let molecules = [];
+    let particles;
+    let particleGeometry;
+    let activeType = 'mineral';
+    let mouse = new THREE.Vector2(0, 0);
+    let targetMouse = new THREE.Vector2(0, 0);
+
+    const oilData = {
+        mineral: {
+            color: 0xffa500,
+            emissive: 0xff4d00,
+            title: "Mineral Oil",
+            subtitle: "Natural Grade",
+            desc: "Traditional refined petroleum. Features inconsistent molecular chains effective for older engine component sealing.",
+            icon: "fas fa-flask",
+            theme: "amber"
+        },
+        semi: {
+            color: 0x00ffcc,
+            emissive: 0x00ff88,
+            title: "Semi-Synthetic",
+            subtitle: "Balanced Hybrid",
+            desc: "A laboratory-perfected blend of natural and synthetic stocks. Significantly better protection against thermal breakdown.",
+            icon: "fas fa-vial",
+            theme: "teal"
+        },
+        synthetic: {
+            color: 0x00f2ff,
+            emissive: 0xbc00ff,
+            title: "Full Synthetic",
+            subtitle: "Engineered Precision",
+            desc: "Chemically engineered for absolute uniformity. Molecules slide with zero friction, offering maximum longevity.",
+            icon: "fas fa-atom",
+            theme: "cyan"
+        }
+    };
+
+    function initMolecular() {
+        const container = document.getElementById('molecular-canvas-container');
+        if (!container) return;
+
+        scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.02);
+
+        camera = new THREE.PerspectiveCamera(60, window.innerWidth / (window.innerHeight * 0.8), 0.1, 1000);
+        camera.position.z = 25;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight * 0.8);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enableZoom = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        createStars();
+        createMolecules('mineral');
+        createParticles();
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 2);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        animateMolecular();
+
+        window.addEventListener('resize', onMolecularResize);
+        window.addEventListener('mousemove', (e) => {
+            targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        window.switchOilType = switchOilType;
+    }
+
+    function createStars() {
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 3000;
+        const posArray = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 400;
+        starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starMat = new THREE.PointsMaterial({ size: 0.1, color: 0xffffff, transparent: true, opacity: 0.3 });
+        scene.add(new THREE.Points(starGeo, starMat));
+    }
+
+    function createMolecules(type) {
+        molecules.forEach(m => scene.remove(m));
+        molecules = [];
+        const data = oilData[type];
+        const count = type === 'synthetic' ? 8 : (type === 'semi' ? 12 : 15);
+
+        for (let i = 0; i < count; i++) {
+            const group = new THREE.Group();
+            const color = data.color;
+            if (type === 'mineral') {
+                for (let j = 0; j < 5; j++) {
+                    const atom = new THREE.Mesh(new THREE.SphereGeometry(Math.random() * 0.5 + 0.3, 16, 16),
+                        new THREE.MeshStandardMaterial({ color, emissive: data.emissive, emissiveIntensity: 0.2 }));
+                    atom.position.set(j * 1.2, (Math.random() - 0.5) * 1, (Math.random() - 0.5) * 1);
+                    group.add(atom);
+                }
+            } else if (type === 'synthetic') {
+                const atomGeo = new THREE.SphereGeometry(0.6, 24, 24);
+                const atomMat = new THREE.MeshStandardMaterial({ color, emissive: data.emissive, emissiveIntensity: 0.5, metalness: 0.9, roughness: 0.1 });
+                for (let j = 0; j < 6; j++) {
+                    const angle = (j / 6) * Math.PI * 2;
+                    const atom = new THREE.Mesh(atomGeo, atomMat);
+                    atom.position.set(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 0);
+                    group.add(atom);
+                }
+                const center = new THREE.Mesh(atomGeo, atomMat);
+                group.add(center);
+            } else {
+                const isSynth = Math.random() > 0.5;
+                const atomCount = isSynth ? 4 : 6;
+                for (let j = 0; j < atomCount; j++) {
+                    const atom = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16),
+                        new THREE.MeshStandardMaterial({ color, emissive: data.emissive, emissiveIntensity: 0.3 }));
+                    atom.position.set((j - atomCount / 2) * 1.5, 0, 0);
+                    group.add(atom);
+                }
+            }
+            group.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 20, (Math.random() - 0.5) * 15);
+            group.userData.velocity = new THREE.Vector3((Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02);
+            scene.add(group);
+            molecules.push(group);
+        }
+    }
+
+    function createParticles() {
+        particleGeometry = new THREE.BufferGeometry();
+        const count = 1500;
+        const posArray = new Float32Array(count * 3);
+        const velArray = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+            posArray[i * 3] = (Math.random() - 0.5) * 60; posArray[i * 3 + 1] = (Math.random() - 0.5) * 40; posArray[i * 3 + 2] = (Math.random() - 0.5) * 30;
+            velArray[i * 3] = (Math.random() - 0.5) * 0.05; velArray[i * 3 + 1] = (Math.random() - 0.5) * 0.05; velArray[i * 3 + 2] = (Math.random() - 0.5) * 0.05;
+        }
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particleGeometry.userData.velocity = velArray;
+        particles = new THREE.Points(particleGeometry, new THREE.PointsMaterial({ size: 0.15, color: 0xffffff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }));
+        scene.add(particles);
+    }
+
+    function switchOilType(type) {
+        if (type === activeType) return;
+        activeType = type;
+        const data = oilData[type];
+        document.querySelectorAll('.oil-toggle-btn').forEach(btn => btn.className = 'oil-toggle-btn px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all text-gray-400 hover:text-white');
+        const activeBtn = document.getElementById('btn-' + type);
+        const themeColor = type === 'synthetic' ? 'cyan' : (type === 'semi' ? 'teal' : 'amber');
+        activeBtn.className = `oil-toggle-btn px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all bg-${themeColor}-500/10 text-${themeColor}-500 border border-${themeColor}-500/20`;
+
+        const card = document.getElementById('info-card');
+        if (card) {
+            gsap.to(card, {
+                opacity: 0, duration: 0.3, onComplete: () => {
+                    document.getElementById('card-title').innerText = data.title;
+                    document.getElementById('card-subtitle').innerText = data.subtitle;
+                    document.getElementById('card-desc').innerText = data.desc;
+                    document.getElementById('card-icon').innerHTML = `<i class="${data.icon}"></i>`;
+                    document.getElementById('card-icon').className = `w-10 h-10 rounded-xl flex items-center justify-center bg-${themeColor}-500/20 text-${themeColor}-500`;
+                    gsap.to(card, { opacity: 1, duration: 0.5 });
+                }
+            });
+        }
+
+        gsap.to(particles.material.color, { r: new THREE.Color(data.color).r, g: new THREE.Color(data.color).g, b: new THREE.Color(data.color).b, duration: 1 });
+        createMolecules(type);
+    }
+
+    function onMolecularResize() {
+        camera.aspect = window.innerWidth / (window.innerHeight * 0.8);
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight * 0.8);
+    }
+
+    function animateMolecular() {
+        requestAnimationFrame(animateMolecular);
+        mouse.x += (targetMouse.x - mouse.x) * 0.05;
+        mouse.y += (targetMouse.y - mouse.y) * 0.05;
+        molecules.forEach(m => {
+            m.position.add(m.userData.velocity);
+            m.rotation.x += 0.005; m.rotation.y += 0.005;
+            if (Math.abs(m.position.x) > 20) m.userData.velocity.x *= -1;
+            if (Math.abs(m.position.y) > 15) m.userData.velocity.y *= -1;
+        });
+        const pos = particleGeometry.attributes.position.array;
+        const vel = particleGeometry.userData.velocity;
+        for (let i = 0; i < pos.length / 3; i++) {
+            pos[i * 3] += vel[i * 3] + mouse.x * 0.05; pos[i * 3 + 1] += vel[i * 3 + 1] + mouse.y * 0.05; pos[i * 3 + 2] += vel[i * 3 + 2];
+            if (Math.abs(pos[i * 3]) > 40) pos[i * 3] *= -0.9;
+        }
+        particleGeometry.attributes.position.needsUpdate = true;
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    // --- DIY Oil Change Simulator Logic ---
+    let sScene, sCamera, sRenderer, sControls, sClock;
+    let sEngine, oilLiquid, drainPan, oilFilter, oilBottle;
+    let drainParticles, pourParticles;
+    let currentStep = 1;
+
+    const steps = [
+        {
+            title: "Initial Check",
+            desc: "Ensure the vehicle is securely lifted. Your oil level is low and dark, indicating oxidation and contaminant buildup.",
+            tip: "Always run the engine for 5 minutes before draining to ensure contaminants are suspended in the fluid.",
+            status: "Change Required",
+            purity: "12%",
+            color: 0x221100
+        },
+        {
+            title: "Draining Oil",
+            desc: "The drain plug is removed. Notice the dark, viscous fluid - this contains microscopic metal shavings and carbon deposits.",
+            tip: "Check the magnetic drain plug for excessive metal shavings which could indicate internal engine wear.",
+            status: "Draining...",
+            purity: "0%",
+            color: 0x221100
+        },
+        {
+            title: "Filter Change",
+            desc: "Unscrewing the saturated old filter. The filter's job is to trap debris, but it eventually loses capacity.",
+            tip: "Smear a bit of fresh oil on the new filter's rubber gasket to ensure a perfect, leak-free seal.",
+            status: "Replacing Filter",
+            purity: "0%",
+            color: 0x442200
+        },
+        {
+            title: "Fresh Refill",
+            desc: "Pouring in premium fully-synthetic oil. The golden liquid restores the engine's molecular protection layer.",
+            tip: "Check your owner's manual for the exact quart capacity. Overfilling can cause aeration and pressure issues.",
+            status: "Refilling...",
+            purity: "85%",
+            color: 0xffaa00
+        },
+        {
+            title: "Complete",
+            desc: "Oil change complete. The purity levels are restored, and your engine is now protected for thousands of miles.",
+            tip: "Record the date and mileage. Consistency is the secret to a high-mileage vehicle's longevity.",
+            status: "Protected",
+            purity: "99.9%",
+            color: 0xffcc00
+        }
+    ];
+
+    function initSimulator() {
+        const container = document.getElementById('simulator-canvas-container');
+        if (!container) return;
+
+        sScene = new THREE.Scene();
+        sCamera = new THREE.PerspectiveCamera(45, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+        sCamera.position.set(8, 6, 12);
+
+        sRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        sRenderer.setSize(container.offsetWidth, container.offsetHeight);
+        sRenderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(sRenderer.domElement);
+
+        sControls = new OrbitControls(sCamera, sRenderer.domElement);
+        sControls.enableDamping = true;
+
+        sClock = new THREE.Clock();
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        sScene.add(ambient);
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(10, 10, 5);
+        sScene.add(sun);
+
+        const floor = new THREE.GridHelper(20, 20, 0x333333, 0x111111);
+        floor.position.y = -4;
+        sScene.add(floor);
+
+        const blockGeo = new THREE.BoxGeometry(4, 3, 5);
+        const blockMat = new THREE.MeshPhysicalMaterial({
+            color: 0x111111,
+            transparent: true,
+            opacity: 0.2,
+            transmission: 0.9,
+            thickness: 1
+        });
+        sEngine = new THREE.Mesh(blockGeo, blockMat);
+        sScene.add(sEngine);
+
+        const oilGeo = new THREE.BoxGeometry(3.8, 2, 4.8);
+        const oilMat = new THREE.MeshStandardMaterial({ color: steps[0].color, transparent: true, opacity: 0.8 });
+        oilLiquid = new THREE.Mesh(oilGeo, oilMat);
+        oilLiquid.position.y = -0.4;
+        sEngine.add(oilLiquid);
+
+        const panGeo = new THREE.BoxGeometry(3, 0.8, 3);
+        const panMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+        drainPan = new THREE.Mesh(panGeo, panMat);
+        drainPan.position.set(0, -3.5, 0);
+        sScene.add(drainPan);
+
+        const filterGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.8, 32);
+        const filterMat = new THREE.MeshStandardMaterial({ color: 0xaa0000 });
+        oilFilter = new THREE.Mesh(filterGeo, filterMat);
+        oilFilter.position.set(1.5, -1, 1.5);
+        sEngine.add(oilFilter);
+
+        const bottleGeo = new THREE.CylinderGeometry(0.3, 0.5, 1.5, 32);
+        const bottleMat = new THREE.MeshStandardMaterial({ color: 0x666666 });
+        oilBottle = new THREE.Mesh(bottleGeo, bottleMat);
+        oilBottle.position.set(3, 4, 0);
+        oilBottle.rotation.z = Math.PI / 4;
+        oilBottle.visible = false;
+        sScene.add(oilBottle);
+
+        const partCount = 500;
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(partCount * 3);
+        const pVel = new Float32Array(partCount * 3);
+        for (let i = 0; i < partCount; i++) {
+            pPos[i * 3] = 0; pPos[i * 3 + 1] = -10; pPos[i * 3 + 2] = 0;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+
+        drainParticles = new THREE.Points(pGeo.clone(), new THREE.PointsMaterial({ color: 0x221100, size: 0.05 }));
+        sScene.add(drainParticles);
+        drainParticles.visible = false;
+
+        pourParticles = new THREE.Points(pGeo.clone(), new THREE.PointsMaterial({ color: 0xffaa00, size: 0.05 }));
+        sScene.add(pourParticles);
+        pourParticles.visible = false;
+
+        animateSimulator();
+    }
+
+    function animateSimulator() {
+        requestAnimationFrame(animateSimulator);
+        const time = sClock.getElapsedTime();
+
+        if (currentStep === 2) {
+            const pos = drainParticles.geometry.attributes.position.array;
+            for (let i = 0; i < pos.length / 3; i++) {
+                pos[i * 3 + 1] -= 0.1;
+                if (pos[i * 3 + 1] < -3.5) {
+                    pos[i * 3] = (Math.random() - 0.5) * 0.1;
+                    pos[i * 3 + 1] = -1.5;
+                    pos[i * 3 + 2] = (Math.random() - 0.5) * 0.1;
+                }
+            }
+            drainParticles.geometry.attributes.position.needsUpdate = true;
+            if (oilLiquid.scale.y > 0.05) {
+                oilLiquid.scale.y -= 0.002;
+                oilLiquid.position.y -= 0.002;
+            }
+        }
+
+        if (currentStep === 4) {
+            const pos = pourParticles.geometry.attributes.position.array;
+            for (let i = 0; i < pos.length / 3; i++) {
+                pos[i * 3 + 1] -= 0.1;
+                if (pos[i * 3 + 1] < 1.5) {
+                    pos[i * 3] = 2.5 + (Math.random() - 0.5) * 0.1;
+                    pos[i * 3 + 1] = 4;
+                    pos[i * 3 + 2] = (Math.random() - 0.5) * 0.1;
+                }
+            }
+            pourParticles.geometry.attributes.position.needsUpdate = true;
+            if (oilLiquid.scale.y < 1.0) {
+                oilLiquid.scale.y += 0.002;
+                oilLiquid.position.y += 0.002;
+                oilLiquid.material.color.lerp(new THREE.Color(steps[3].color), 0.01);
+            }
+        }
+
+        if (sEngine) sEngine.rotation.y = Math.sin(time * 0.2) * 0.1;
+
+        sControls.update();
+        sRenderer.render(sScene, sCamera);
+    }
+
+    window.nextStep = () => {
+        if (currentStep >= 5) return;
+        currentStep++;
+        updateUI();
+        handleStepLogic();
+    };
+
+    window.prevStep = () => {
+        if (currentStep <= 1) return;
+        currentStep--;
+        updateUI();
+        handleStepLogic();
+    };
+
+    function updateUI() {
+        const step = steps[currentStep - 1];
+        document.getElementById('step-number').innerText = currentStep;
+        document.getElementById('step-title').innerText = step.title;
+        document.getElementById('step-description').innerText = step.desc;
+        document.getElementById('pro-tip-text').innerText = step.tip;
+        document.getElementById('engine-status-text').innerText = step.status;
+        document.getElementById('purity-text').innerText = step.purity;
+        document.getElementById('progress-indicator').style.width = `${(currentStep / 5) * 100}%`;
+
+        const statusEl = document.getElementById('engine-status-text');
+        statusEl.className = currentStep === 5 ? 'text-xs font-black text-green-500 uppercase' : 'text-xs font-black text-red-500 uppercase';
+    }
+
+    function handleStepLogic() {
+        drainParticles.visible = (currentStep === 2);
+        pourParticles.visible = (currentStep === 4);
+        oilBottle.visible = (currentStep === 4);
+
+        if (currentStep === 1) {
+            oilLiquid.scale.y = 1;
+            oilLiquid.position.y = -0.4;
+            oilLiquid.material.color.set(steps[0].color);
+            oilFilter.material.color.set(0xaa0000);
+        }
+
+        if (currentStep === 3) {
+            gsap.to(oilFilter.rotation, {
+                x: Math.PI * 4, duration: 1, onComplete: () => {
+                    oilFilter.material.color.set(0x00ff00);
+                }
+            });
+        }
+
+        if (currentStep === 5) {
+            oilLiquid.material.color.set(steps[4].color);
+        }
+    }
+
+    window.resetSimulator = () => {
+        currentStep = 1;
+        updateUI();
+        handleStepLogic();
+    };
+
+    window.addEventListener('resize', () => {
+        const container = document.getElementById('simulator-canvas-container');
+        if (container && sCamera && sRenderer) {
+            sCamera.aspect = container.offsetWidth / container.offsetHeight;
+            sCamera.updateProjectionMatrix();
+            sRenderer.setSize(container.offsetWidth, container.offsetHeight);
+        }
+    });
+
+    initMolecular();
+    initSimulator();
+</script>
+{% endblock %}

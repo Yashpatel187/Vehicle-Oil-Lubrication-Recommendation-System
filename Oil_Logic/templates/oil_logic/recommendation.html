@@ -1,0 +1,1056 @@
+{% extends 'oil_logic/base.html' %}
+
+{% block content %}
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+<section class="max-w-4xl mx-auto px-6 py-12 min-h-[80vh] flex flex-col items-center">
+    <!-- Stepper Progress -->
+    <div id="stepper" class="w-full max-w-2xl mb-12 flex justify-between items-center relative">
+        <div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 z-0"></div>
+        <div id="step-progress"
+            class="absolute top-1/2 left-0 w-0 h-0.5 bg-red-500 -translate-y-1/2 z-0 transition-all duration-500"></div>
+
+        <div class="step-item relative z-10 flex flex-col items-center gap-2 group">
+            <div
+                class="w-10 h-10 rounded-full bg-[#0A0A0A] border-2 border-white/10 flex items-center justify-center group-[.active]:border-red-500 group-[.active]:text-red-500 transition-all font-bold">
+                1</div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-500 group-[.active]:text-white">Type</span>
+        </div>
+        <div class="step-item relative z-10 flex flex-col items-center gap-2 group">
+            <div
+                class="w-10 h-10 rounded-full bg-[#0A0A0A] border-2 border-white/10 flex items-center justify-center group-[.active]:border-red-500 group-[.active]:text-red-500 transition-all font-bold">
+                2</div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-500 group-[.active]:text-white">Vehicle</span>
+        </div>
+        <div class="step-item relative z-10 flex flex-col items-center gap-2 group">
+            <div
+                class="w-10 h-10 rounded-full bg-[#0A0A0A] border-2 border-white/10 flex items-center justify-center group-[.active]:border-red-500 group-[.active]:text-red-500 transition-all font-bold">
+                3</div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-500 group-[.active]:text-white">Usage</span>
+        </div>
+        <div class="step-item relative z-10 flex flex-col items-center gap-2 group">
+            <div
+                class="w-10 h-10 rounded-full bg-[#0A0A0A] border-2 border-white/10 flex items-center justify-center group-[.active]:border-red-500 group-[.active]:text-red-500 transition-all font-bold">
+                4</div>
+            <span
+                class="text-[10px] font-black uppercase tracking-widest text-gray-500 group-[.active]:text-white">Result</span>
+        </div>
+    </div>
+
+    <!-- Wizard Container -->
+    <div class="w-full max-w-4xl">
+        <!-- Step 1: Vehicle Type -->
+        <div id="wizard-step-1" class="wizard-step space-y-8 animate-in fade-in slide-in-from-bottom-5">
+            <div class="text-center">
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">Select <span class="text-red-500">Engine
+                        Category</span></h2>
+                <p class="text-gray-500">The journey to peak performance starts with your vehicle type.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <button onclick="nextStep(2, 'Car')"
+                    class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 group hover:border-red-500/50 transition-all duration-500">
+                    <div
+                        class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                        <i class="fas fa-car text-4xl text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-2xl font-black uppercase">Passenger Car</h3>
+                        <p class="text-sm text-gray-500 mt-2 tracking-wide">Consumer & Performance Autos</p>
+                    </div>
+                </button>
+                <button onclick="nextStep(2, 'Bike')"
+                    class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 group hover:border-red-500/50 transition-all duration-500">
+                    <div
+                        class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                        <i class="fas fa-motorcycle text-4xl text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-2xl font-black uppercase">Motorcycle</h3>
+                        <p class="text-sm text-gray-500 mt-2 tracking-wide">Two-Wheel Precision Engineering</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Brand/Model/Year -->
+        <div id="wizard-step-2" class="wizard-step hidden space-y-12 animate-in fade-in slide-in-from-right-10">
+            <div class="text-center">
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">Precision <span
+                        class="text-red-500">Identification</span></h2>
+                <p id="selected-type-display" class="text-xs font-black uppercase tracking-[0.3em] text-red-500"></p>
+            </div>
+
+            <div class="glass p-12 rounded-[2.5rem] space-y-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Brand</label>
+                        <div class="relative">
+                            <select id="brand-select"
+                                class="w-full bg-black/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all appearance-none cursor-pointer">
+                                <option value="">Select Brand</option>
+                            </select>
+                            <i
+                                class="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Model</label>
+                        <div class="relative">
+                            <select id="model-select"
+                                class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all appearance-none cursor-pointer">
+                                <option value="">Select Model</option>
+                            </select>
+                            <i
+                                class="fas fa-chevron-down absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Year</label>
+                        <input type="number" id="year-input" placeholder="2024"
+                            class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all">
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 pt-6">
+                    <button onclick="nextStep(1)"
+                        class="w-full md:w-auto px-12 py-5 rounded-2xl font-black uppercase tracking-widest glass hover:bg-white/5 transition-all">Back</button>
+                    <button id="to-usage-btn"
+                        class="flex-1 uiverse-btn py-5 rounded-2xl font-black uppercase tracking-widest text-white">Next:
+                        Usage Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Usage Profile (New) -->
+        <div id="wizard-step-3" class="wizard-step hidden space-y-12 animate-in fade-in slide-in-from-right-10">
+            <div class="text-center">
+                <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">Usage <span
+                        class="text-red-500">Analysis</span></h2>
+                <p class="text-gray-500">How you drive determines your engine's thermal and mechanical stress.</p>
+            </div>
+
+            <div class="glass p-12 rounded-[2.5rem] space-y-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Driving
+                            Condition</label>
+                        <select id="driving-condition"
+                            class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all appearance-none cursor-pointer">
+                            <option value="Mixed">Mixed (Default)</option>
+                            <option value="City">City / Stop-Start Traffic</option>
+                            <option value="Highway">Highway / Long Cruises</option>
+                            <option value="Off-road">Off-road / Rough Terrain</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Current
+                            Odometer</label>
+                        <select id="mileage-range"
+                            class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all appearance-none cursor-pointer">
+                            <option value="0-50k">0 - 50,000 km</option>
+                            <option value="50k-100k">50,001 - 1,00,000 km</option>
+                            <option value="100k-150k">1,00,001 - 1,50,000 km</option>
+                            <option value="Above-150k">Above 1,50,000 km</option>
+                        </select>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Preferred
+                            Frequency</label>
+                        <select id="preferred-frequency"
+                            class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-lg font-bold outline-none focus:border-red-500 transition-all appearance-none cursor-pointer">
+                            <option value="5-6m">Every 5-6 Months</option>
+                            <option value="3-4m">Every 3-4 Months</option>
+                            <option value="12m">Every 12 Months (Long Life)</option>
+                            <option value="Manufacturer">Manufacturer Standard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 pt-6">
+                    <button type="button" onclick="nextStep(2)"
+                        class="w-full md:w-auto px-12 py-5 rounded-2xl font-black uppercase tracking-widest glass hover:bg-white/5 transition-all">Back</button>
+                    <button type="button" id="find-btn"
+                        class="flex-1 uiverse-btn py-5 rounded-2xl font-black uppercase tracking-widest text-white">Generate
+                        Comparison Matrix</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Result & Loading -->
+        <div id="wizard-step-4" class="wizard-step hidden animate-in fade-in">
+            <!-- Loading View -->
+            <div id="loading-view" class="flex flex-col items-center justify-center py-20 space-y-12">
+                <div class="car-container relative w-64 h-24 flex items-center justify-center">
+                    <!-- Speed Lines -->
+                    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                        <div class="speed-line line-1"></div>
+                        <div class="speed-line line-2"></div>
+                        <div class="speed-line line-3"></div>
+                    </div>
+
+                    <!-- The Sports Car -->
+                    <div class="sports-car text-6xl text-red-500 relative z-10">
+                        <i class="fas fa-car-side"></i>
+                        <!-- Exhaust Flame -->
+                        <div class="exhaust-flame"></div>
+                    </div>
+
+                    <!-- Road/Ground -->
+                    <div class="absolute bottom-0 w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div class="road-move"></div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm font-black uppercase tracking-[0.3em] text-gray-500">Correlating Engine Specs</p>
+                    <p class="text-[10px] text-gray-600 mt-2 font-mono">Running logic matrix v2.4...</p>
+                </div>
+            </div>
+
+            <!-- Result View (Injected via JS) -->
+            <div id="result-container" class="hidden pt-10"></div>
+        </div>
+    </div>
+</section>
+
+<!-- HIDDEN CSRF TOKEN FOR JS -->
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+<!-- Oil Detail Modal -->
+<div id="oil-detail-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" onclick="closeOilModal()"></div>
+    <div class="relative w-full max-w-3xl glass-premium rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-[0_0_80px_rgba(0,0,0,0.8)] animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 border border-white/10 max-h-[90vh]">
+        <button onclick="closeOilModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg glass hover:bg-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all z-20">
+            <i class="fas fa-times text-xs"></i>
+        </button>
+
+        <!-- Left Column: Visual Showcase -->
+        <div class="w-full md:w-[40%] bg-gradient-to-br from-red-500/5 via-transparent to-transparent p-6 md:p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-white/5">
+            <div class="relative group w-full flex flex-col items-center justify-center">
+                <div class="absolute inset-0 bg-red-500/5 blur-[40px] opacity-50"></div>
+                <div class="w-40 h-40 md:w-48 md:h-48 flex items-center justify-center relative z-10 transition-transform duration-700 group-hover:scale-105">
+                    <img id="modal-oil-image" src="" alt="Oil Product" class="max-w-full max-h-full object-contain drop-shadow-[0_15px_30px_rgba(255,77,77,0.2)]">
+                </div>
+                <div class="mt-6 relative z-10">
+                     <span class="px-4 py-1.5 bg-red-500 text-[8px] font-black uppercase tracking-[0.2em] text-white rounded-full">Automotive Grade</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Engineering & Checkout -->
+        <div class="flex-1 p-6 md:p-10 space-y-6 overflow-y-auto">
+            <div class="space-y-6">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span id="modal-oil-brand-label" class="text-[9px] font-black uppercase tracking-[0.4em] text-red-500 bg-red-500/10 px-3 py-1 rounded-md"></span>
+                        <div class="h-px flex-1 bg-white/5"></div>
+                    </div>
+                    <h2 id="modal-oil-name" class="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white leading-[0.9] glow-text"></h2>
+                </div>
+                
+                <div class="flex flex-wrap gap-4">
+                    <div class="spec-card">
+                        <span class="label">Viscosity</span>
+                        <span id="modal-oil-viscosity" class="value text-red-500"></span>
+                    </div>
+                    <div class="spec-card">
+                        <span class="label">Base Type</span>
+                        <span id="modal-oil-type" class="value"></span>
+                    </div>
+                    <div class="spec-card">
+                        <span class="label">Volume</span>
+                        <span id="modal-oil-volume" class="value"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest text-[#555]">Performance Description</h4>
+                    <p id="modal-oil-description" class="text-xs md:text-sm text-gray-400 leading-relaxed font-medium italic border-l-2 border-white/5 pl-4"></p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                    <div class="space-y-1.5">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-gray-500">API Certification</p>
+                        <p id="modal-oil-api" class="text-lg font-black text-white"></p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Service Interval</p>
+                        <p id="modal-oil-interval" class="text-lg font-black text-white"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing and Action -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 mt-4">
+                <div class="space-y-1 text-center sm:text-left">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Price per unit</p>
+                    <div class="flex items-baseline gap-1.5 justify-center sm:justify-start">
+                        <span class="text-xl text-red-500 font-black">₹</span>
+                        <span id="modal-oil-price" class="text-5xl font-black text-white tracking-tighter tabular-nums"></span>
+                    </div>
+                </div>
+                <button id="modal-action-btn" class="w-full sm:w-auto px-10 py-5 bg-red-500 hover:bg-white text-white hover:text-black font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl shadow-xl shadow-red-500/20 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3">
+                    <i class="fas fa-shopping-cart"></i>
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .wizard-step.hidden {
+        display: none;
+    }
+
+    .typewriter {
+        overflow: hidden;
+        border-right: .15em solid #FF4D4D;
+        white-space: nowrap;
+        margin: 0 auto;
+        letter-spacing: .15em;
+        animation:
+            typing 3.5s steps(40, end),
+            blink-caret .75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from {
+            width: 0
+        }
+
+        to {
+            width: 100%
+        }
+    }
+
+    @keyframes blink-caret {
+
+        from,
+        to {
+            border-color: transparent
+        }
+
+        50% {
+            border-color: #FF4D4D;
+        }
+    }
+
+    @keyframes carDrive {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(0);
+        }
+
+        25% {
+            transform: translateY(-2px) rotate(-1deg);
+        }
+
+        75% {
+            transform: translateY(1px) rotate(1deg);
+        }
+    }
+
+    @keyframes exhaust {
+
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 0.8;
+        }
+
+        50% {
+            transform: scale(1.5);
+            opacity: 0.4;
+        }
+    }
+
+    @keyframes speedLine {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        to {
+            transform: translateX(-200%);
+            opacity: 0;
+        }
+    }
+
+    @keyframes roadMove {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(-100%);
+        }
+    }
+
+    .sports-car {
+        animation: carDrive 0.15s infinite linear;
+    }
+
+    .exhaust-flame {
+        position: absolute;
+        left: -15px;
+        bottom: 5px;
+        width: 20px;
+        height: 10px;
+        background: linear-gradient(to right, transparent, #FF4D4D);
+        border-radius: 50%;
+        filter: blur(2px);
+        animation: exhaust 0.1s infinite alternate;
+    }
+
+    .speed-line {
+        position: absolute;
+        height: 2px;
+        background: linear-gradient(to left, rgba(255, 77, 77, 0.5), transparent);
+        border-radius: 2px;
+    }
+
+    .line-1 {
+        top: 20%;
+        width: 60px;
+        animation: speedLine 0.4s infinite linear;
+    }
+
+    .line-2 {
+        top: 50%;
+        width: 100px;
+        animation: speedLine 0.6s infinite linear 0.1s;
+    }
+
+    .line-3 {
+        top: 80%;
+        width: 40px;
+        animation: speedLine 0.5s infinite linear 0.2s;
+    }
+
+    .road-move {
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(90deg, #FF4D4D 0, #FF4D4D 40px, transparent 40px, transparent 80px);
+        animation: roadMove 0.3s infinite linear;
+    }
+
+    .spec-card {
+        flex: 1;
+        min-width: 80px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 0.6rem 1rem;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        transition: all 0.3s;
+    }
+
+    .spec-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        transform: translateY(-1px);
+    }
+
+    .spec-card .label {
+        font-size: 7px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #444;
+    }
+
+    .spec-card .value {
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: white;
+    }
+</style>
+
+<script>
+    let currentType = 'Car';
+    let currentStep = 1;
+    window.currentResults = [];
+    window.selectedProfile = {
+        climate: 'Normal',
+        style: 'Highway'
+    };
+    window.activeVehicleIndex = null;
+    window.oilLookupMap = {}; 
+
+    function openOilModal(oilId) {
+        const oil = window.oilLookupMap[oilId];
+        if (!oil) return;
+        document.getElementById('modal-oil-name').innerText = oil.brand;
+        document.getElementById('modal-oil-brand-label').innerText = oil.brand;
+        document.getElementById('modal-oil-viscosity').innerText = oil.viscosity;
+        document.getElementById('modal-oil-type').innerText = oil.oil_type;
+        document.getElementById('modal-oil-api').innerText = oil.api_rating || 'SN PLUS';
+        document.getElementById('modal-oil-interval').innerText = `${oil.change_interval_km} KM`;
+        document.getElementById('modal-oil-volume').innerText = `${oil.rec_volume || oil.volume_liters}L`;
+        document.getElementById('modal-oil-price').innerText = oil.rec_price || oil.price;
+        document.getElementById('modal-oil-description').innerText = oil.description || `Engineered for high-stress environments. Provides superior shear stability and film strength at high temperatures. Verified for ${oil.viscosity} performance standards.`;
+        document.getElementById('modal-oil-image').src = oil.image || oil.image_url || "https://img.icons8.com/isometric/512/oil-can.png";
+        document.getElementById('modal-action-btn').onclick = () => addToCart(oilId);
+        const modal = document.getElementById('oil-detail-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeOilModal() {
+        const modal = document.getElementById('oil-detail-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+
+    function nextStep(step, type = null) {
+        console.log("Navigating to step:", step, type);
+        if (type) {
+            currentType = type;
+            document.getElementById('selected-type-display').innerText = type + ' Engineering';
+            loadBrands(type);
+        }
+
+        // Hide all steps
+        document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('hidden'));
+        // Show target step
+        document.getElementById(`wizard-step-${step}`).classList.remove('hidden');
+
+        // Update Stepper UI
+        const items = document.querySelectorAll('.step-item');
+        items.forEach((item, idx) => {
+            if (idx < step) item.classList.add('active');
+            else item.classList.remove('active');
+        });
+
+        // Update Progress Bar
+        const progress = document.getElementById('step-progress');
+        progress.style.width = ((step - 1) / 3) * 100 + '%';
+
+        currentStep = step;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function loadBrands(type) {
+        const brandSelect = document.getElementById('brand-select');
+        brandSelect.innerHTML = '<option value="">Select Brand</option>';
+        try {
+            const response = await fetch(`/api/brands/?vehicle_type=${type}`);
+            const brands = await response.json();
+            brands.reduce((acc, brand) => {
+                const opt = document.createElement('option');
+                opt.value = brand;
+                opt.textContent = brand;
+                brandSelect.appendChild(opt);
+                return acc;
+            }, '');
+        } catch (e) { console.error(e); }
+    }
+
+    document.getElementById('brand-select').addEventListener('change', async (e) => {
+        const brand = e.target.value;
+        const modelSelect = document.getElementById('model-select');
+        modelSelect.innerHTML = '<option value="">Select Model</option>';
+        if (!brand) return;
+
+        try {
+            const response = await fetch(`/api/models/?brand=${brand}`);
+            const models = await response.json();
+            models.forEach(model => {
+                const opt = document.createElement('option');
+                opt.value = model;
+                opt.textContent = model;
+                modelSelect.appendChild(opt);
+            });
+        } catch (e) { console.error(e); }
+    });
+
+    document.getElementById('find-btn').addEventListener('click', async () => {
+        const brandRaw = document.getElementById('brand-select').value;
+        const modelRaw = document.getElementById('model-select').value;
+        const yearRaw = document.getElementById('year-input').value;
+
+        const brand = brandRaw ? brandRaw.trim() : '';
+        const model = modelRaw ? modelRaw.trim() : '';
+        const year = yearRaw ? yearRaw.trim() : '';
+
+        if (!brand || !model || !year) return alert("Please specify brand, model and year");
+
+        const btn = document.getElementById('find-btn');
+        const origText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i> Analyzing Engineering Data...';
+
+        console.log("Triggering recommendation for:", { brand, model, year });
+
+        try {
+            const params = new URLSearchParams({
+                brand,
+                model,
+                year,
+                vehicle_type: currentType,
+                driving_condition: document.getElementById('driving-condition').value,
+                mileage_range: document.getElementById('mileage-range').value,
+                preferred_frequency: document.getElementById('preferred-frequency').value
+            });
+            const response = await fetch(`${window.location.origin}/api/vehicles/recommendations/?${params.toString()}`);
+
+            if (response.status === 404) {
+                throw new Error("Vehicle not found in our database for this year. Please check the model year.");
+            }
+            console.log("Response Status:", response.status);
+            if (!response.ok) {
+                const errText = await response.text();
+                console.error("Server Error Detail:", errText);
+                throw new Error("Search service unavailable. (Error " + response.status + ")");
+            }
+
+            const data = await response.json();
+            console.log("Data received:", data);
+            window.currentResults = Array.isArray(data) ? data : [data];
+
+            if (window.currentResults.length === 0) {
+                throw new Error("No variants found for this specific combination.");
+            }
+
+            // If multiple variants exist, show variant selection view
+            if (window.currentResults.length > 1) {
+                showVariantSelection(window.currentResults);
+            } else if (window.currentResults.length === 1) {
+                console.log("Single result found, auto-analyzing.");
+                analyzeVehicle(0);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = origText;
+
+        } catch (e) {
+            console.error("Search Error:", e);
+            const errorBanner = document.getElementById('error-banner') || createErrorBanner();
+            errorBanner.innerText = e.message || "Recommendation failed for this combination.";
+            errorBanner.classList.remove('hidden');
+            
+            btn.disabled = false;
+            btn.innerHTML = origText;
+            // Scroll to error
+            errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    // Add navigation logic for the new step
+    document.getElementById('to-usage-btn').addEventListener('click', () => {
+        const brand = document.getElementById('brand-select').value;
+        const model = document.getElementById('model-select').value;
+        const year = document.getElementById('year-input').value;
+
+        if (!brand || !model || !year) return alert("Please specify brand, model and year");
+        nextStep(3);
+    });
+
+    function showVariantSelection(variants) {
+        const loadingView = document.getElementById('loading-view');
+        const container = document.getElementById('result-container');
+        loadingView.classList.add('hidden');
+        container.classList.remove('hidden');
+
+        container.innerHTML = `
+            <div class="space-y-8 animate-in slide-in-from-bottom-5 duration-700 max-w-2xl mx-auto">
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <p class="text-sm font-bold text-gray-500">${variants.length} vehicle(s) found.</p>
+                </div>
+
+                <div class="space-y-4">
+                    ${variants.map((v, index) => `
+                        <div onclick="triggerAI(${index})" 
+                            class="group relative bg-white/5 border border-white/5 hover:border-red-500/50 p-6 rounded-2xl cursor-pointer transition-all hover:bg-white/[0.07] overflow-hidden">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-xl font-black uppercase tracking-tighter text-white">
+                                        ${v.brand} ${v.model} (${v.displacement_cc || '---'}cc) (${v.engine_type[0]}) (${v.year})
+                                    </h4>
+                                    <p class="text-sm text-gray-500 mt-1 font-bold">
+                                        ${v.variant_name} / ${v.engine_type} Core
+                                    </p>
+                                </div>
+                                <div class="text-[10px] font-black text-white/20 uppercase tracking-widest group-hover:text-red-500 transition-colors">
+                                    Engine ID: ${v.id}
+                                </div>
+                            </div>
+                            <!-- Subtle indicator -->
+                            <div class="absolute inset-y-0 left-0 w-1 bg-transparent group-hover:bg-red-500 transition-all"></div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+            </div>
+        `;
+    }
+
+    function selectProfile(category, value) {
+        window.selectedProfile[category] = value;
+        // Visual feedback
+        const buttons = event.currentTarget.parentElement.querySelectorAll('.profile-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('border-red-500', 'bg-red-500/10');
+            btn.classList.add('border-white/5', 'bg-white/5');
+            btn.querySelector('i').classList.add('opacity-20');
+        });
+        event.currentTarget.classList.add('border-red-500', 'bg-red-500/10');
+        event.currentTarget.classList.remove('border-white/5', 'bg-white/5');
+        event.currentTarget.querySelector('i').classList.remove('opacity-20');
+        event.currentTarget.querySelector('i').classList.add('opacity-100');
+    }
+
+    function triggerAI(index) {
+        analyzeVehicle(index);
+    }
+
+    async function analyzeVehicle(index) {
+        console.log("Analyzing vehicle index:", index);
+        nextStep(4); // Show loading container
+        const v = window.currentResults[index];
+        if (!v) {
+            console.error("Vehicle data not found at index", index);
+            return;
+        }
+
+        const container = document.getElementById('result-container');
+        const loadingView = document.getElementById('loading-view');
+
+        // Ensure result is hidden while loading
+        container.classList.add('hidden');
+        loadingView.classList.remove('hidden');
+
+        // Minimal feedback delay for "calculation feel"
+        await new Promise(r => setTimeout(r, 1200));
+
+        console.log("Displaying result for:", v.brand, v.model);
+        showRecommendationResult(v);
+    }
+
+    function createErrorBanner() {
+        const banner = document.createElement('div');
+        banner.id = 'error-banner';
+        banner.className = 'bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-6 font-bold text-center hidden';
+        const wizard = document.querySelector('.wizard-container');
+        wizard.prepend(banner);
+        return banner;
+    }
+
+    function calculateAIOil(v, profile) {
+        console.log("Calculating AI Oil for:", v.vehicle_type, v.engine_type);
+        // Base Viscosity Hierarchy
+        const levels = ['0W-20', '5W-30', '5W-40', '10W-40', '15W-50', '20W-50'];
+        let baseIndex = 1; // Default 5W-30
+
+        try {
+            // Normalize engine type (handle string or array)
+            const engineType = Array.isArray(v.engine_type) ? v.engine_type[0] : v.engine_type;
+            const variantName = v.variant_name ? v.variant_name.toLowerCase() : '';
+
+            // 1. Base Logic
+            if (engineType === 'Diesel') baseIndex = 2; // 5W-40
+            else if (engineType === 'Petrol' || variantName.includes('hybrid')) baseIndex = 0; // 0W-20
+
+            // Turbo Override
+            if (variantName.includes('turbo') && baseIndex < 1) baseIndex = 1; // Min 5W-30
+
+            // 2. Climate Adjustment
+            if (profile.climate === 'Hot') baseIndex = Math.min(baseIndex + 1, levels.length - 1);
+            else if (profile.climate === 'Cold') baseIndex = Math.max(baseIndex - 1, 0);
+
+            // 3. Vehicle Age (<= 2021)
+            if (v.year <= 2021) baseIndex = Math.min(baseIndex + 1, levels.length - 1);
+
+            // 4. Driving Style Overrides
+            if (profile.style === 'Heavy') baseIndex = 2; // Force 5W-40
+        } catch (e) {
+            console.warn("Calculation nudge error, using defaults:", e);
+        }
+
+        return {
+            viscosity: levels[baseIndex] || '5W-30',
+            is_heavy: profile.style === 'Heavy',
+            is_aged: v.year <= 2021
+        };
+    }
+
+    function showRecommendationResult(v) {
+        console.log("Rendering Comparison Screen...");
+        try {
+            const loadingView = document.getElementById('loading-view');
+            const container = document.getElementById('result-container');
+
+            loadingView.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            const recs = v.recommendations;
+            const options = [
+                { type: 'Premium', color: 'gold', badge: 'badge-premium', data: recs?.premium },
+                { type: 'Recommended', color: 'red', badge: 'badge-primary', highlighted: true, data: recs?.primary },
+                { type: 'Economy', color: 'green', badge: 'badge-economy', data: recs?.economy }
+            ];
+
+            // Build lookup map for modal (Store THE ENTIRE RECOMMENDATION for that specific vehicle)
+            options.forEach(opt => {
+                if (opt.data && opt.data.id) {
+                    // Use a composite key or just ensure we store the contextual data
+                    window.oilLookupMap[opt.data.id] = { ...opt.data };
+                }
+            });
+
+            container.innerHTML = `
+            <div class="w-full max-w-4xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20">
+                <div class="flex items-center justify-between mt-10">
+                    <button onclick="nextStep(3)" class="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-all">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <div class="text-right">
+                        <h4 class="text-xl font-black uppercase tracking-tighter">${v.brand} ${v.model}</h4>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">${v.year} | ${v.engine_type} | ${v.displacement_cc}cc</p>
+                    </div>
+                </div>
+
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-black uppercase tracking-tighter mb-4">Precision <span class="text-red-500">Comparison</span></h2>
+                    <p class="text-gray-500">Matched against your driving profile and engine specifications.</p>
+                </div>
+
+                <div class="comparison-table overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Oil Product</th>
+                                <th>Viscosity</th>
+                                <th>Type</th>
+                                <th>Rating</th>
+                                <th>Interval</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${options.filter(opt => opt.data).map(opt => {
+                                const o = opt.data;
+                                return `
+                                <tr class="${opt.highlighted ? 'highlighted' : ''} group hover:bg-white/[0.02] transition-colors cursor-pointer" onclick="openOilModal(${o.id})">
+                                    <td>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-[10px] font-black uppercase tracking-wider text-gray-400 opacity-60">${opt.type}</span>
+                                            ${opt.type === 'Premium' ? '<span class="badge-premium w-fit">MOTUL EXCELLENCE</span>' : ''}
+                                            ${opt.type === 'Economy' ? '<span class="badge-economy w-fit">BEST VALUE</span>' : ''}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center group-hover:bg-white/10 transition-colors overflow-hidden p-1">
+                                                <img src="${o.image || o.image_url || 'https://img.icons8.com/isometric/50/oil-can.png'}" alt="${o.brand}" class="max-w-full max-h-full object-contain">
+                                            </div>
+                                            <div>
+                                                <p class="font-black text-white uppercase">${o.brand}</p>
+                                                <p class="text-[10px] text-gray-500 font-bold">In Stock</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="font-black text-lg text-white">${o.viscosity}</span></td>
+                                    <td><span class="text-[10px] font-black text-gray-500 uppercase">${o.oil_type}</span></td>
+                                    <td>
+                                        <div class="text-[10px] font-bold text-gray-500">
+                                            <p>${o.api_rating || 'SN+'}</p>
+                                        </div>
+                                    </td>
+                                    <td><span class="text-xs font-black text-white">${o.change_interval_km} KM</span></td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex items-baseline gap-1">
+                                            <span class="text-xs text-red-500 font-bold">₹</span>
+                                            <span class="text-lg font-black text-white">${o.rec_price || o.price}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="event.stopPropagation(); openOilModal(${o.id})" class="p-2 w-8 h-8 flex items-center justify-center rounded-lg glass hover:text-white transition-all">
+                                                <i class="fas fa-expand-alt text-xs"></i>
+                                            </button>
+                                            <button onclick="event.stopPropagation(); addToCart(${o.id})" class="bg-red-500 hover:bg-red-600 text-white p-2 w-8 h-8 flex items-center justify-center rounded-lg shadow-xl shadow-red-500/10 transition-all">
+                                                <i class="fas fa-cart-plus text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                    <div class="glass p-6 rounded-2xl border-t-2 border-red-500/50">
+                        <h5 class="text-[10px] font-black uppercase text-red-500 mb-2">Maximum Life</h5>
+                        <p class="text-[11px] text-gray-400 leading-relaxed italic">Specifically chosen for high mileage protection.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border-t-2 border-white/10">
+                        <h5 class="text-[10px] font-black uppercase text-white/50 mb-2">Expert Balanced</h5>
+                        <p class="text-[11px] text-gray-400 leading-relaxed italic">Optimal viscosity for your local climate conditions.</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border-t-2 border-green-500/50">
+                        <h5 class="text-[10px] font-black uppercase text-green-500 mb-2">Thermal Stability</h5>
+                        <p class="text-[11px] text-gray-400 leading-relaxed italic">Resistant to high-temp oxidation and sludge.</p>
+                    </div>
+                </div>
+            </div>
+            `;
+        } catch (error) {
+            console.error("FATAL UI ERROR:", error);
+            alert("An error occurred while rendering results.");
+            nextStep(2);
+        }
+    }
+
+    async function addToCart(oilId) {
+        if (!oilId || oilId === 'TBA') return alert("Product selection pending data availability.");
+
+        console.log("Adding oil to cart:", oilId);
+        const csrfToken = document.getElementById('csrf_token').value;
+
+        try {
+            const response = await fetch(`${window.location.origin}/cart/add/${oilId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                // Trigger a success notification (Custom alert for premium feel)
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-10 right-10 bg-green-600 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest shadow-2xl animate-in slide-in-from-right-10 z-[100]';
+                toast.innerHTML = `<i class="fas fa-shopping-cart mr-2"></i> Added to Cart`;
+                document.body.appendChild(toast);
+
+                // Update cart count if exists in header
+                const cartCounter = document.getElementById('cart-count'); 
+                if (cartCounter) cartCounter.innerText = data.cart_count;
+
+                setTimeout(() => toast.remove(), 3000);
+            } else {
+                alert("Could not add to cart. Please ensure you are logged in.");
+            }
+        } catch (error) {
+            console.error("Cart error:", error);
+            alert("Connection error. Please try again.");
+        }
+    }
+
+    window.onerror = function(message, source, lineno, colno, error) {
+        console.error("GLOBAL JS ERROR:", { message, source, lineno, colno, error });
+        // alert("A technical error occurred in the browser logic. Please check the console.");
+        return false;
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Recommendation Page Loaded & Ready.");
+    });
+
+</script>
+
+<style>
+    .glow-text {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .comparison-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 1.5rem;
+        overflow-x: auto; /* Changed from hidden to auto */
+        -webkit-overflow-scrolling: touch; /* Better mobile experience */
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .comparison-table th {
+        background: rgba(255, 255, 255, 0.03);
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        color: #777;
+    }
+
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .comparison-table tr.highlighted {
+        background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+    }
+
+    .comparison-table tr.highlighted td:first-child {
+        border-left: 4px solid #ef4444;
+    }
+
+    .badge-premium {
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        color: black;
+        font-size: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-weight: 900;
+    }
+
+    .comparison-table {
+        scrollbar-width: thin;
+        scrollbar-color: #ef4444 rgba(255, 255, 255, 0.05);
+        padding-bottom: 8px; /* Room for the scrollbar */
+    }
+
+    .comparison-table::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .comparison-table::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+    }
+
+    .comparison-table::-webkit-scrollbar-thumb {
+        background: #ef4444;
+        border-radius: 10px;
+    }
+
+    .comparison-table table {
+        min-width: 950px; /* Slightly increased to ensure 'Action' and 'Price' are distinct */
+    }
+
+    .badge-economy {
+        background: #4ade80;
+        color: black;
+        font-size: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        font-weight: 900;
+    }
+</style>
+{% endblock %}

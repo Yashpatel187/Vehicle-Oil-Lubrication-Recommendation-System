@@ -1,0 +1,225 @@
+{% extends 'oil_logic/base.html' %}
+
+{% block content %}
+<section class="min-h-[80vh] flex flex-col items-center justify-center px-6 py-12">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-5xl font-black italic uppercase tracking-tighter mb-4">
+            Vehicle <span class="text-red-500">Intelligence</span>
+        </h1>
+        <p class="text-gray-500 font-bold uppercase tracking-[0.3em] text-[10px]">Registry Access • Real-time Diagnostic Data</p>
+    </div>
+
+    <!-- Welcome Back Box -->
+    <div class="w-full max-w-2xl mb-12">
+        <div class="glass-premium p-8 rounded-[2rem] border-l-4 border-red-500 flex items-center gap-6 shadow-2xl relative overflow-hidden group">
+            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-red-500/10 blur-[50px] rounded-full"></div>
+            
+            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-800 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg">
+                {{ user.username|first|upper }}
+            </div>
+            <div class="relative z-10">
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Welcome Back</p>
+                <h2 class="text-3xl font-black text-white uppercase tracking-tighter">
+                    {{ user.get_full_name|default:user.username }}
+                </h2>
+                {% if user.profile.tagline %}
+                <p class="text-[10px] text-red-500 font-black uppercase tracking-widest mt-1">{{ user.profile.tagline }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Central -->
+    <div class="w-full max-w-2xl">
+        <div class="glass-premium p-10 rounded-[3rem] border-white/5 shadow-2xl space-y-8 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-500/5 blur-[80px]"></div>
+
+            <div class="space-y-4 relative z-10">
+                <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 block">Unit Identification
+                    Number (Plate)</label>
+                <div class="flex gap-4">
+                    <input type="text" id="plate-input" placeholder="e.g. MH 12 AB 1234"
+                        class="flex-grow bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-xl text-white font-black tracking-widest focus:border-red-500 outline-none transition-all uppercase placeholder:text-white/10">
+                    <button onclick="lookupPlate()" id="lookup-btn"
+                        class="btn-primary px-10 rounded-2xl font-black text-white hover:bg-red-600 transition-all uppercase tracking-widest text-xs">
+                        Fetch
+                    </button>
+                </div>
+            </div>
+
+            <div id="lookup-error"
+                class="hidden p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-bold text-center">
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div id="vehicle-result" class="hidden mt-8 space-y-6">
+            <div class="glass-premium p-10 rounded-[3rem] border-white/5 shadow-2xl relative overflow-hidden">
+                <div class="absolute -bottom-24 -left-16 w-48 h-48 bg-red-500/5 blur-[80px]"></div>
+
+                <!-- Main Specs -->
+                <div class="flex justify-between items-start mb-10 relative z-10">
+                    <div>
+                        <p id="res-brand" class="text-[10px] font-black uppercase tracking-widest text-red-500 mb-2">
+                        </p>
+                        <h3 id="res-model" class="text-5xl font-black text-white uppercase tracking-tighter italic">
+                        </h3>
+                        <p id="res-details" class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2"></p>
+                    </div>
+                    <div id="puc-status"
+                        class="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border"></div>
+                </div>
+
+                <!-- Detailed Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                            <p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-2">Registered
+                                Owner</p>
+                            <p id="res-owner" class="text-xl font-black text-white uppercase"></p>
+                        </div>
+                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                            <p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-2">Engine
+                                Configuration</p>
+                            <p id="res-engine" class="text-xl font-black text-white uppercase italic"></p>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                            <p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-2">Registration
+                                Date</p>
+                            <p id="res-reg-date" class="text-xl font-black text-white"></p>
+                        </div>
+                        <div class="p-6 bg-white/[0.02] border border-white/5 rounded-3xl">
+                            <p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-2">PUC Expiration
+                            </p>
+                            <p id="res-puc" class="text-xl font-black text-white"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Action -->
+                <div class="pt-10 mt-10 border-t border-white/5 relative z-10 flex gap-4">
+                    <button onclick="location.reload()"
+                        class="flex-grow py-5 rounded-2xl bg-white/5 border border-white/10 font-black text-white text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">New
+                        Search</button>
+                    <button onclick="addVehicle()" id="add-btn"
+                        class="flex-grow btn-primary py-5 rounded-2xl font-black text-white text-[10px] uppercase tracking-widest">Add
+                        to My Garage</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    let currentVehicleData = null;
+
+    async function lookupPlate() {
+        const plate = document.getElementById('plate-input').value.trim();
+        const btn = document.getElementById('lookup-btn');
+        const errorDiv = document.getElementById('lookup-error');
+        const resultDiv = document.getElementById('vehicle-result');
+
+        if (!plate) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>';
+        errorDiv.classList.add('hidden');
+        resultDiv.classList.add('hidden');
+
+        try {
+            const response = await fetch(`/api/lookup-plate/?plate=${encodeURIComponent(plate)}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                currentVehicleData = data;
+                currentVehicleData.plate = plate;
+
+                document.getElementById('res-brand').textContent = data.brand;
+                document.getElementById('res-model').textContent = data.model;
+                document.getElementById('res-details').textContent = `${data.year} • ${data.vehicle_type}`;
+                document.getElementById('res-owner').textContent = data.owner_name;
+                document.getElementById('res-engine').textContent = data.engine_type || 'N/A';
+                document.getElementById('res-reg-date').textContent = data.registration_date;
+                document.getElementById('res-puc').textContent = data.puc_expiry;
+
+                const pucStatus = document.getElementById('puc-status');
+                const expiry = new Date(data.puc_expiry);
+                const today = new Date();
+                const isExpired = expiry < today;
+
+                pucStatus.textContent = isExpired ? 'PUC EXPIRED' : 'PUC VALID';
+                pucStatus.className = `px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border ${isExpired ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-green-500/10 border-green-500/30 text-green-500'}`;
+
+                resultDiv.classList.remove('hidden');
+            } else {
+                errorDiv.textContent = data.message || 'Vehicle identity not found in registry.';
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.error(err);
+            errorDiv.textContent = 'Network communication failure. Ensure secure connection.';
+            errorDiv.classList.remove('hidden');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Fetch';
+        }
+    }
+
+    async function addVehicle() {
+        if (!currentVehicleData) return;
+        const btn = document.getElementById('add-btn');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></span>';
+
+        try {
+            const response = await fetch('/api/add-by-plate/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    plate: currentVehicleData.plate,
+                    vehicle_id: currentVehicleData.vehicle_id,
+                    puc_expiry: currentVehicleData.puc_expiry
+                })
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                alert('Vehicle successfully deployed to your personal garage.');
+                location.href = "{% url 'garage' %}";
+            } else {
+                alert(data.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Add to My Garage';
+            }
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = 'Add to My Garage';
+        }
+    }
+
+    // Enter key support
+    document.getElementById('plate-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') lookupPlate();
+    });
+
+    // Auto-lookup from URL
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plate = urlParams.get('plate');
+        if (plate) {
+            document.getElementById('plate-input').value = plate;
+            lookupPlate();
+        }
+    });
+</script>
+
+{% csrf_token %}
+{% endblock %}

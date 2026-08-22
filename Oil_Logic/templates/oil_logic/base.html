@@ -1,0 +1,816 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OilRec | Premium Automotive Care{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+    <meta name="theme-color" content="#FF4D4D">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+        
+        :root {
+            /* ── Default Dark (Garage) Mode ── */
+            --bg-primary: #0A0A0A;
+            --bg-secondary: #141414;
+            --text-primary: #ffffff;
+            --text-muted: #6b7280;
+            --card-bg: rgba(20, 20, 20, 0.85);
+            --border-col: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(10, 10, 10, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --accent: #FF4D4D;
+            --accent-glow: 0 0 20px rgba(255, 77, 77, 0.3);
+        }
+
+        html.light {
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #F1F5F9;
+            --text-primary: #1E293B;
+            --text-muted: #64748B;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-col: rgba(0, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --accent: #D10000;
+            --accent-glow: 0 4px 15px rgba(209, 0, 0, 0.2);
+            color-scheme: light;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .glass {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .glass-premium {
+            background: rgba(20, 20, 20, 0.85);
+            /* Slightly darker, more opaque */
+            backdrop-filter: blur(20px);
+            /* Much stronger blur for better glass effect */
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            /* Brighter border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF4D4D 0%, #B30000 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--neon-red);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Scrollbar - High Visibility */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+            border: 2px solid #050505;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF4D4D;
+        }
+
+        /* Force Dark Selection Dropdowns - Robust Fix */
+        select,
+        select option {
+            background-color: #0A0A0A !important;
+            color: #ffffff !important;
+        }
+
+        /* Removing default arrow to avoid white background issues on some browsers */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1.5rem center;
+            background-size: 1rem;
+            padding-right: 3rem;
+        }
+
+        /* Global Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .page-transition {
+            opacity: 0;
+        }
+
+        /* ── Modern Button Effect (Uiverse inspired) ── */
+        .cssbuttons-io-button {
+            background: #FF4D4D;
+            color: white;
+            font-family: inherit;
+            padding: 0.35em;
+            padding-left: 1.2em;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 12px;
+            border: none;
+            letter-spacing: 0.15em;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 1.6em -0.6em #B30000;
+            overflow: hidden;
+            position: relative;
+            height: 2.8em;
+            padding-right: 3.3em;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .cssbuttons-io-button .icon {
+            background: white;
+            margin-left: 1em;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.2em;
+            width: 2.2em;
+            border-radius: 10px;
+            box-shadow: 0.1em 0.1em 0.6em 0.2em rgba(179, 0, 0, 0.2);
+            right: 0.3em;
+            transition: all 0.3s;
+        }
+
+        .cssbuttons-io-button:hover .icon {
+            width: calc(100% - 0.6em);
+        }
+
+        .cssbuttons-io-button .icon svg {
+            width: 1.1em;
+            transition: transform 0.3s;
+            color: #FF4D4D;
+        }
+
+        .cssbuttons-io-button:hover .icon svg {
+            transform: translateX(0.1em);
+        }
+
+        .cssbuttons-io-button:active .icon {
+            transform: scale(0.95);
+        }
+
+        /* --- Neomorphic / Uiverse Styles --- */
+        .uiverse-btn {
+            --hover-shadows: 16px 16px 33px #050505, -16px -16px 33px #1a1a1a;
+            --accent: #FF4D4D;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            border: none;
+            background-color: #111;
+            cursor: pointer;
+            color: white;
+            transition: box-shadow ease-in-out 0.3s, background-color ease-in-out 0.1s,
+                letter-spacing ease-in-out 0.1s, transform ease-in-out 0.1s;
+            box-shadow: 10px 10px 20px #050505, -10px -10px 20px #181818;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .uiverse-btn:hover {
+            box-shadow: var(--hover-shadows);
+        }
+
+        .uiverse-btn:active {
+            box-shadow: var(--hover-shadows), var(--accent) 0px 0px 30px 5px;
+            background-color: var(--accent);
+            transform: scale(0.95);
+        }
+
+        /* Neomorphic Inputs */
+        select, input#year-input, #driving-condition, #mileage-range, #preferred-frequency {
+            box-shadow: inset 5px 5px 10px #050505, inset -5px -5px 10px #121212 !important;
+            border: 1px solid rgba(255, 255, 255, 0.02) !important;
+        }
+
+        /* --- Shine Effect for Nav REMOVED - Using Underline Instead --- */
+        .btn-shine {
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .btn-shine:hover {
+            color: #FF4D4D; /* Optional: text color change on hover to match red line */
+        }
+
+        /* --- Growing Underline/Overline Effect --- */
+        .btn-shine {
+            position: relative;
+            padding: 4px 0;
+            display: inline-block;
+        }
+
+        .btn-shine::before {
+            margin-left: auto;
+        }
+
+        .btn-shine::after, .btn-shine::before {
+            content: '';
+            width: 0%;
+            height: 2px;
+            background: #FF4D4D;
+            display: block;
+            transition: 0.5s;
+        }
+
+        .btn-shine:hover::after, .btn-shine:hover::before {
+            width: 100%;
+        }
+
+        /* --- Li-Deheng Uiverse Button Effect --- */
+        .uiverse-synergy-btn {
+            --main-size: 1.25rem;
+            --color-text: #ffffff;
+            --color-background: #B30000;
+            --color-background-hover: #FF4D4D;
+            --color-outline: #ff4d4d40;
+            --color-shadow: #00000080;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 9999px;
+            padding: 1.25rem 2.5rem;
+            font-weight: 900;
+            font-size: var(--main-size);
+            color: var(--color-text);
+            background: var(--color-background);
+            box-shadow: 0 0 10px 0 var(--color-background);
+            transition: 0.5s;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .uiverse-synergy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .uiverse-synergy-btn:hover {
+            outline: 0.1em solid transparent;
+            outline-offset: 0.2em;
+            box-shadow: 0 0 1.5em 0 var(--color-background);
+            animation: ripple 1s linear infinite, colorize 1s infinite;
+            transition: 0.5s;
+            color: white;
+        }
+
+        .uiverse-synergy-btn span {
+            margin-right: 0.3em;
+            transition: 0.5s;
+        }
+
+        .uiverse-synergy-btn:hover span {
+            text-shadow: 5px 5px 5px var(--color-shadow);
+        }
+
+        .uiverse-synergy-btn svg {
+            height: 1em;
+            fill: var(--color-text);
+            margin-right: -0.16em;
+            position: relative;
+            transition: 0.5s;
+        }
+
+        .uiverse-synergy-btn:hover svg {
+            margin-right: 0.25em;
+            transition: 0.5s;
+            filter: drop-shadow(5px 5px 2.5px var(--color-shadow));
+        }
+
+        .uiverse-synergy-btn svg polygon:nth-child(1) {
+            transition: 0.4s;
+            transform: translateX(-60%);
+        }
+
+        .uiverse-synergy-btn svg polygon:nth-child(2) {
+            transition: 0.5s;
+            transform: translateX(-30%);
+        }
+
+        .uiverse-synergy-btn:hover svg polygon:nth-child(1) {
+            transform: translateX(0%);
+            animation: opacity 1s infinite 0.6s;
+        }
+
+        .uiverse-synergy-btn:hover svg polygon:nth-child(2) {
+            transform: translateX(0%);
+            animation: opacity 1s infinite 0.4s;
+        }
+
+        .uiverse-synergy-btn:hover svg polygon:nth-child(3) {
+            animation: opacity 1s infinite 0.2s;
+        }
+
+        @keyframes opacity {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes colorize {
+            0% { background: var(--color-background); }
+            50% { background: var(--color-background-hover); }
+            100% { background: var(--color-background); }
+        }
+
+        @keyframes ripple {
+            0% { outline: 0em solid transparent; outline-offset: -0.1em; }
+            50% { outline: 0.2em solid var(--color-outline); outline-offset: 0.2em; }
+            100% { outline: 0.4em solid transparent; outline-offset: 0.4em; }
+        }
+
+        /* --- 'Learn More' Button Effect --- */
+        .learn-more {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            outline: none;
+            border: 0;
+            vertical-align: middle;
+            text-decoration: none;
+            background: transparent;
+            padding: 0;
+            font-size: inherit;
+            font-family: inherit;
+            width: 12rem;
+            height: auto;
+        }
+
+        .learn-more .circle {
+            transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+            position: relative;
+            display: block;
+            margin: 0;
+            width: 3rem;
+            height: 3rem;
+            background: #B30000;
+            border-radius: 1.625rem;
+        }
+
+        .learn-more .circle .icon {
+            transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            background: #fff;
+        }
+
+        .learn-more .circle .icon.arrow {
+            transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+            left: 0.625rem;
+            width: 1.125rem;
+            height: 0.125rem;
+            background: none;
+        }
+
+        .learn-more .circle .icon.arrow::before {
+            position: absolute;
+            content: "";
+            top: -0.29rem;
+            right: 0.0625rem;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-top: 0.125rem solid #fff;
+            border-right: 0.125rem solid #fff;
+            transform: rotate(45deg);
+        }
+
+        .learn-more .button-text {
+            transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0.75rem 0;
+            margin: 0 0 0 1.85rem;
+            color: #ffffff;
+            font-weight: 700;
+            line-height: 1.6;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .learn-more:hover .circle {
+            width: 100%;
+        }
+
+        .learn-more:hover .circle .icon.arrow {
+            background: #fff;
+            transform: translate(1rem, 0);
+        }
+
+        .learn-more:hover .button-text {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="{% url 'home' %}" class="group flex items-center gap-3">
+                <div class="relative">
+                    <i class="fas fa-oil-can text-3xl text-red-500 group-hover:rotate-12 transition-transform"></i>
+                    <div
+                        class="absolute -inset-2 bg-red-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                </div>
+                <span class="text-2xl font-black uppercase tracking-tighter">Oil<span
+                        class="text-red-500">Rec</span></span>
+            </a>
+
+            <div class="flex items-center gap-4">
+                <div
+                    class="hidden md:flex items-center space-x-8 text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <a href="{% url 'home' %}" class="btn-shine">Home</a>
+                    <a href="{% url 'garage' %}" class="btn-shine">Garage</a>
+                    <a href="{% url 'recommendation_page' %}" class="btn-shine">Recommender</a>
+                    <a href="{% url 'shop_page' %}" class="btn-shine">Shop</a>
+                    <a href="{% url 'academy' %}" class="btn-shine">Academy</a>
+
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="w-8 h-8 rounded-lg glass hover:bg-white/10 flex items-center justify-center transition-all group overflow-hidden border border-white/10" title="Toggle Theme">
+                        <i class="fas fa-sun text-yellow-400 theme-icon-sun transition-all duration-500 text-xs"></i>
+                        <i class="fas fa-moon text-blue-400 theme-icon-moon hidden transition-all duration-500 text-xs"></i>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <!-- Cart Icon -->
+                    <a href="{% url 'cart_view' %}" class="relative group p-2 hover:text-white transition">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span id="cart-count"
+                            class="absolute -top-1 -right-1 bg-red-500 text-[8px] text-white w-4 h-4 rounded-full flex items-center justify-center font-black">
+                            {{ user.cart_items.count|default:0 }}
+                        </span>
+                    </a>
+
+                    <!-- Profile Dropdown -->
+                    <div class="relative ml-4">
+                        <button onclick="toggleProfileDropdown()"
+                            class="flex items-center gap-3 group focus:outline-none">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center text-white border-2 border-white/10 group-hover:border-red-500 transition-all shadow-lg overflow-hidden">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                        </button>
+
+                        <div id="profile-dropdown"
+                            class="hidden absolute right-0 mt-4 w-72 glass-premium rounded-3xl p-6 shadow-2xl border border-white/10 animate-scale-in">
+                            <div class="space-y-4">
+                                <div class="pb-4 border-b border-white/5">
+                                    <p class="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] mb-1">
+                                        MEMBER
+                                        PROFILE</p>
+                                    <p class="text-white text-lg font-black truncate leading-tight">
+                                        {% if user.first_name %}
+                                        {{ user.first_name }} {{ user.last_name }}
+                                        {% else %}
+                                        {{ user.username|capfirst }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-[10px] text-gray-500 mt-1 lowercase truncate">{{ user.email }}</p>
+                                    {% if user.profile.tagline %}
+                                    <p class="text-[9px] text-red-500 font-bold mt-1 uppercase tracking-widest">{{ user.profile.tagline }}</p>
+                                    {% endif %}
+                                    {% if user.profile.phone_number %}
+                                    <p class="text-[9px] text-red-500/80 font-bold mt-1">{{ user.profile.phone_number }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <a href="{% url 'garage' %}"
+                                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition text-gray-400 hover:text-white">
+                                        <i class="fas fa-warehouse text-xs"></i>
+                                        <span>My Garage</span>
+                                    </a>
+                                    <a href="{% url 'profile_page' %}"
+                                        class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition text-gray-400 hover:text-white">
+                                        <i class="fas fa-history text-xs"></i>
+                                        <span>Purchase History</span>
+                                    </a>
+                                </div>
+
+                                <div class="pt-4 border-t border-white/5">
+                                    <form method="post" action="{% url 'account_logout' %}" class="w-full">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                            class="w-full flex items-center justify-center gap-3 p-3 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition font-black">
+                                            <i class="fas fa-sign-out-alt text-xs"></i>
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'account_signup' %}" class="cssbuttons-io-button">
+                        Get Started
+                        <div class="icon">
+                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+
+
+
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden text-white" onclick="toggleMenu()">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('profile-dropdown');
+            const btn = dropdown?.previousElementSibling;
+            if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!-- Mobile Fullscreen Menu -->
+    <div id="mobile-menu"
+        class="fixed inset-0 z-[60] glass hidden items-center justify-center animate-in fade-in duration-300">
+        <button class="absolute top-6 right-6 text-3xl" onclick="toggleMenu()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="flex flex-col items-center space-y-8 text-2xl font-black uppercase tracking-widest">
+            <a href="{% url 'home' %}" onclick="toggleMenu()">Home</a>
+            <a href="{% url 'garage' %}" onclick="toggleMenu()">My Garage</a>
+            <a href="{% url 'recommendation_page' %}" onclick="toggleMenu()">Recommender</a>
+            <a href="{% url 'academy' %}" onclick="toggleMenu()">Academy</a>
+            <a href="{% url 'shop_page' %}" onclick="toggleMenu()">Shop</a>
+
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="text-red-500">Sign Out</button>
+            </form>
+            {% else %}
+            <a href="{% url 'account_signup' %}" class="cssbuttons-io-button" onclick="toggleMenu()">
+                Get Started
+                <div class="icon">
+                    <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                            fill="currentColor"></path>
+                    </svg>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+            document.body.classList.toggle('overflow-hidden');
+        }
+    </script>
+
+    <main class="flex-grow pt-20 page-transition animate-fade-in">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 px-6 mt-20">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">OIL<span class="text-red-500">REC</span></span>
+                </div>
+                <p class="text-gray-500">Empowering vehicle owners with data-driven lubrication expertise.</p>
+            </div>
+            <!-- More footer columns... -->
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+    <!-- GlideAdvisor Floating UI -->
+    <div id="glide-advisor-container" class="fixed bottom-6 right-6 z-[100] font-sans">
+        <!-- Chat Bubble -->
+        <button id="chat-bubble" onclick="toggleChat()"
+            class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-red-500/40 hover:scale-110 active:scale-95 transition-all duration-300 group">
+            <i class="fas fa-robot text-2xl group-hover:hidden"></i>
+            <i class="fas fa-times text-2xl hidden group-hover:block" id="close-icon"></i>
+            <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-red-600 border-2 border-white/20"></span>
+            </span>
+        </button>
+
+        <!-- Chat Panel -->
+        <div id="chat-panel"
+            class="hidden absolute bottom-24 right-0 w-[350px] md:w-[420px] h-[550px] bg-[#0F0F0F]/95 backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-500 scale-95 origin-bottom-right">
+            <!-- Header -->
+            <div
+                class="p-8 border-b border-white/5 bg-gradient-to-r from-red-500/10 to-transparent flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-500/20">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-white">Elara</h3>
+                        <p class="text-[9px] text-red-500 font-black uppercase tracking-widest mt-0.5">Automotive AI</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="text-white/20 hover:text-white transition-colors">
+                    <i class="fas fa-minus text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide py-10">
+                <div class="flex gap-4">
+                    <div
+                        class="w-8 h-8 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center flex-shrink-0 text-red-500 text-[10px] mt-1 shadow-sm">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div
+                        class="bg-white/[0.03] p-5 rounded-3xl rounded-tl-none border border-white/5 max-w-[85%] shadow-sm">
+                        <p class="text-[11px] text-white/70 leading-relaxed font-semibold">
+                            Greetings! I am <span class="text-white font-black">Elara</span>, your premium
+                            lubrication expert. How can I assist you with your engine's health today?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-8 border-t border-white/5 bg-white/[0.02]">
+                <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative">
+                    <input type="text" id="chat-input"
+                        class="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-[11px] text-white placeholder-white/20 focus:outline-none focus:border-red-500/50 transition-all pr-14 font-semibold shadow-inner"
+                        placeholder="Type your technical query...">
+                    <button type="submit"
+                        class="absolute right-2 top-2 w-10 h-10 bg-red-500 rounded-xl text-white flex items-center justify-center hover:bg-red-600 active:scale-95 transition-all shadow-lg shadow-red-500/20">
+                        <i class="fas fa-paper-plane text-[10px]"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/glide_advisor.js' %}"></script>
+    <script>
+        // --- Theme Management ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isLight = html.classList.toggle('light');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcons(isLight);
+        }
+
+        function updateThemeIcons(isLight) {
+            const sun = document.querySelector('.theme-icon-sun');
+            const moon = document.querySelector('.theme-icon-moon');
+            if (isLight) {
+                sun?.classList.add('hidden');
+                moon?.classList.remove('hidden');
+            } else {
+                sun?.classList.remove('hidden');
+                moon?.classList.add('hidden');
+            }
+        }
+
+        // Initialize theme
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const isLight = savedTheme === 'light';
+            if (isLight) {
+                document.documentElement.classList.add('light');
+                updateThemeIcons(true);
+            }
+        })();
+
+        // --- PWA Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/pwa/sw.js')
+                    .then(reg => console.log('ServiceWorker registered:', reg))
+                    .catch(err => console.error('ServiceWorker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
